@@ -287,3 +287,7 @@ export function mergeRefs<T>(
     });
   };
 }
+export const cleanChatName = (name: string | null | undefined): string => {
+  if (!name) return '';
+  return name.replace(/<(?:thought|think)>[\s\S]*?(?:<\/(?:thought|think)>|$)/gi, '').trim();
+};

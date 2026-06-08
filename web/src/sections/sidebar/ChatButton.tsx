@@ -6,7 +6,7 @@ import useChatSessions from "@/hooks/useChatSessions";
 import { deleteChatSession, renameChatSession } from "@/app/app/services/lib";
 import { ChatSession } from "@/app/app/interfaces";
 import ConfirmationModalLayout from "@/refresh-components/layouts/ConfirmationModalLayout";
-import { noProp } from "@/lib/utils";
+import { noProp, cleanChatName } from "@/lib/utils";
 import { cn } from "@opal/utils";
 import { Popover, PopoverMenu } from "@opal/components";
 import { useAppRouter } from "@/hooks/appNavigation";
@@ -111,7 +111,7 @@ const ChatButton = memo(
     );
     const mounted = useOnMount();
     const [displayName, setDisplayName] = useState(
-      chatSession.name || UNNAMED_CHAT
+      cleanChatName(chatSession.name) || UNNAMED_CHAT
     );
     const [renaming, setRenaming] = useState(false);
     const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] =
@@ -154,7 +154,7 @@ const ChatButton = memo(
 
     // Sync local name state when chatSession.name changes (e.g., after auto-naming)
     useEffect(() => {
-      const newName = chatSession.name || UNNAMED_CHAT;
+      const newName = cleanChatName(chatSession.name) || UNNAMED_CHAT;
       const oldName = displayName;
 
       // Only animate if transitioning from UNNAMED_CHAT to a real name
@@ -441,7 +441,7 @@ const ChatButton = memo(
           >
             {renaming ? (
               <ButtonRenaming
-                initialName={chatSession.name}
+                initialName={cleanChatName(chatSession.name)}
                 onRename={handleRename}
                 onClose={() => setRenaming(false)}
               />

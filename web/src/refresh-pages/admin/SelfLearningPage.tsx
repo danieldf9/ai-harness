@@ -226,12 +226,12 @@ export default function SelfLearningPage() {
               ) : (
                 policies.map(p => (
                   <div key={p.id} className="p-4 border border-border-200 rounded-lg bg-background-50 flex justify-between items-center">
-                    <div className="flex flex-col">
-                      <Text className="font-semibold">{p.name}</Text>
-                      <Text mainUiBody text05>
-                        Target: {p.target_type} {p.target_id ? `(${p.target_id})` : "(Global)"} | 
-                        Retries: {p.max_retries} | 
-                        Status: {p.enabled ? "Enabled" : "Disabled"}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Text className="font-semibold">
+                        {p.name}{" "}
+                        <span className="text-text-500 font-normal ml-1">
+                          | Target: {p.target_type} {p.target_id ? `(${p.target_id})` : "(Global)"} | Retries: {p.max_retries} | Status: {p.enabled ? "Enabled" : "Disabled"}
+                        </span>
                       </Text>
                     </div>
                     <Button size="sm" prominence="secondary" onClick={() => handleDeletePolicy(p.id)} icon={SvgX}>Delete</Button>
@@ -255,12 +255,12 @@ export default function SelfLearningPage() {
               ) : (
                 rules.map(r => (
                   <div key={r.id} className="p-4 border border-border-200 rounded-lg bg-background-50 flex justify-between items-center">
-                    <div className="flex flex-col">
-                      <Text className="font-semibold">{r.target_type} {r.target_id ? `(${r.target_id})` : "(Global)"}</Text>
-                      <Text mainUiBody text05>
-                        Requires Human Approval: {r.require_human_approval ? "Yes" : "No"} | 
-                        Dry Run: {r.is_dry_run ? "Yes" : "No"} | 
-                        Min Confidence: {r.min_confidence_score}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Text className="font-semibold">
+                        {r.target_type} {r.target_id ? `(${r.target_id})` : "(Global)"}{" "}
+                        <span className="text-text-500 font-normal ml-1">
+                          | Requires Human Approval: {r.require_human_approval ? "Yes" : "No"} | Dry Run: {r.is_dry_run ? "Yes" : "No"} | Min Confidence: {r.min_confidence_score}
+                        </span>
                       </Text>
                     </div>
                     <Button size="sm" prominence="secondary" onClick={() => handleDeleteRule(r.id)} icon={SvgX}>Delete</Button>

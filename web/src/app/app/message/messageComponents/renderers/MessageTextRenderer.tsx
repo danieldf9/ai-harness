@@ -127,17 +127,19 @@ export const MessageTextRenderer: MessageRenderer<
     isAwaitingAutoPlaybackStart,
   } = useVoiceMode();
 
-  const fullContent = packets
-    .map((packet) => {
-      if (
-        packet.obj.type === PacketType.MESSAGE_DELTA ||
-        packet.obj.type === PacketType.MESSAGE_START
-      ) {
-        return packet.obj.content;
-      }
-      return "";
-    })
-    .join("");
+  const fullContent = useMemo(() => {
+    return packets
+      .map((packet) => {
+        if (
+          packet.obj.type === PacketType.MESSAGE_DELTA ||
+          packet.obj.type === PacketType.MESSAGE_START
+        ) {
+          return packet.obj.content;
+        }
+        return "";
+      })
+      .join("");
+  }, [packets]);
 
   const shouldUseAutoPlaybackSync =
     autoPlayback &&

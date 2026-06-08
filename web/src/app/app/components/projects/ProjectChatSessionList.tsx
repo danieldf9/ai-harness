@@ -11,6 +11,7 @@ import { formatRelativeTime } from "./project_utils";
 import Text from "@/refresh-components/texts/Text";
 import { cn } from "@opal/utils";
 import { UNNAMED_CHAT } from "@/lib/constants";
+import { cleanChatName } from "@/lib/utils";
 import ChatSessionSkeleton from "@/refresh-components/skeletons/ChatSessionSkeleton";
 import { SvgBubbleText } from "@opal/icons";
 
@@ -102,10 +103,10 @@ export default function ProjectChatSessionList() {
                           text03
                           mainUiBody
                           nowrap
-                          className="truncate"
-                          title={chat.name}
+                          className="truncate max-w-[calc(100%-2rem)]"
+                          title={cleanChatName(chat.name) || UNNAMED_CHAT}
                         >
-                          {chat.name || UNNAMED_CHAT}
+                          {cleanChatName(chat.name) || UNNAMED_CHAT}
                         </Text>
                       </div>
                       <div className="flex items-center">

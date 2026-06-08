@@ -103,7 +103,7 @@ export function usePacketProcessor(
   const state = stateRef.current;
 
   // Derive displayGroups (not state!)
-  const effectiveFinalAnswerComing = state.finalAnswerComing || forceShowAnswer;
+  const effectiveFinalAnswerComing = state.finalAnswerComing || forceShowAnswer || state.stopPacketSeen;
   const displayGroups = useMemo(() => {
     if (effectiveFinalAnswerComing || state.toolGroups.length === 0) {
       return state.potentialDisplayGroups;
@@ -123,9 +123,7 @@ export function usePacketProcessor(
 
   // Callback reads from ref: always current value, no ref needed in component
   const onRenderComplete = useCallback(() => {
-    if (stateRef.current.finalAnswerComing) {
-      setRenderComplete(true);
-    }
+    setRenderComplete(true);
   }, []);
 
   const markAllToolsDisplayed = useCallback(() => {
@@ -151,8 +149,8 @@ export function usePacketProcessor(
     finalAnswerComing: state.finalAnswerComing,
     toolProcessingDuration: state.toolProcessingDuration,
 
-    // Completion: stopPacketSeen && renderComplete
-    isComplete: state.stopPacketSeen && renderComplete,
+    // Completion: stopPacketSeen && (renderComplete or nothing to render)
+    isComplete: state.stopPacketSeen && (renderComplete || state.potentialDisplayGroups.length === 0),
 
     // Callbacks
     onRenderComplete,

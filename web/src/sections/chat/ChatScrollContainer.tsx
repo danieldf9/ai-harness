@@ -55,13 +55,7 @@ export interface ChatScrollContainerProps {
   hideScrollbar?: boolean;
 }
 
-// Build a CSS mask that fades content opacity at top/bottom edges
-function buildContentMask(): string {
-  // Mask uses black = visible, transparent = hidden
-  // Top: fades from transparent to visible over 1rem
-  // Bottom: fades from visible to transparent over 1rem
-  return `linear-gradient(to bottom, transparent 0%, transparent 0rem, black ${TOP_FADE_HEIGHT}, black calc(100% - ${BOTTOM_FADE_HEIGHT}), transparent 100%)`;
-}
+
 
 const ChatScrollContainer = React.memo(
   React.forwardRef(
@@ -346,8 +340,7 @@ const ChatScrollContainer = React.memo(
         return () => clearTimeout(timeoutId);
       }, [sessionId, anchorSelector, anchorOffsetPx, updateScrollState]);
 
-      // Build mask to fade content opacity at edges
-      const contentMask = buildContentMask();
+
 
       return (
         <div className="flex flex-col flex-1 min-h-0 w-full relative overflow-hidden mb-1">
@@ -357,20 +350,17 @@ const ChatScrollContainer = React.memo(
             data-testid="chat-scroll-container"
             data-chat-scroll
             className={cn(
-              "flex flex-col flex-1 min-h-0 overflow-y-auto overflow-x-hidden",
+              "flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden",
               hideScrollbar ? "no-scrollbar" : "default-scrollbar"
             )}
             onScroll={handleScroll}
             style={{
               scrollbarGutter: "stable both-edges",
-              // Apply mask to fade content opacity at edges
-              maskImage: contentMask,
-              WebkitMaskImage: contentMask,
             }}
           >
             <div
               ref={contentWrapperRef}
-              className="w-full flex-1 flex flex-col items-center px-4"
+              className="w-full min-h-full flex flex-col items-center px-4"
               data-scroll-ready={isScrollReady}
               style={{
                 visibility: isScrollReady ? "visible" : "hidden",

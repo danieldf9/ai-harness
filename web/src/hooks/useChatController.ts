@@ -1005,6 +1005,18 @@ export default function useChatController({
                 .reserved_assistant_message_id;
             }
 
+            // Single-model: handle reserved IDs.
+            // This packet is metadata-only — skip the content-processing chain below.
+            if (
+              !isMultiModel &&
+              (Object.hasOwn(packet, "user_message_id") ||
+                Object.hasOwn(packet, "reserved_assistant_message_id"))
+            ) {
+              userNodeDirty = true;
+              pendingFlush = true;
+              continue;
+            }
+
             // Multi-model: handle reserved IDs for N parallel model responses.
             // This packet is metadata-only — skip the content-processing chain below.
             if (

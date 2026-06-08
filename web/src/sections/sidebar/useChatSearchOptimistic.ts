@@ -5,6 +5,7 @@ import { useProjects } from "@/lib/hooks/useProjects";
 import { errorHandlingFetcher } from "@/lib/fetcher";
 import { ChatSearchResponse } from "@/app/app/interfaces";
 import { UNNAMED_CHAT } from "@/lib/constants";
+import { cleanChatName } from "@/lib/utils";
 
 export interface FilterableChat {
   id: string;
@@ -37,7 +38,7 @@ function transformApiResponse(response: ChatSearchResponse): FilterableChat[] {
     for (const chat of group.chats) {
       chats.push({
         id: chat.id,
-        label: chat.name || UNNAMED_CHAT,
+        label: cleanChatName(chat.name) || UNNAMED_CHAT,
         time: chat.time_created,
       });
     }
@@ -81,7 +82,7 @@ export function useChatSearchOptimistic(
     for (const chat of chatSessions) {
       chatMap.set(chat.id, {
         id: chat.id,
-        label: chat.name || UNNAMED_CHAT,
+        label: cleanChatName(chat.name) || UNNAMED_CHAT,
         time: chat.time_updated || chat.time_created,
       });
     }
@@ -91,7 +92,7 @@ export function useChatSearchOptimistic(
       for (const chat of project.chat_sessions) {
         chatMap.set(chat.id, {
           id: chat.id,
-          label: chat.name || UNNAMED_CHAT,
+          label: cleanChatName(chat.name) || UNNAMED_CHAT,
           time: chat.time_updated || chat.time_created,
         });
       }

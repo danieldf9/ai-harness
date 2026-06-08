@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 from collections.abc import Generator
 from datetime import timedelta
 from uuid import UUID
@@ -109,6 +110,12 @@ logger = setup_logger()
 
 router = APIRouter(prefix="/chat")
 
+def _clean_chat_name(name: str | None) -> str | None:
+    if not name:
+        return name
+    cleaned = re.sub(r'<(?:thought|think)>.*?(?:</(?:thought|think)>|$)', '', name, flags=re.DOTALL | re.IGNORECASE).strip()
+    return cleaned
+
 
 def _get_available_tokens_for_persona(
     persona: Persona,
@@ -191,7 +198,7 @@ def get_user_chat_sessions(
         sessions=[
             ChatSessionDetails(
                 id=chat.id,
-                name=chat.description,
+                name=_clean_chat_name(chat.description),
                 persona_id=chat.persona_id,
                 time_created=chat.time_created.isoformat(),
                 time_updated=chat.time_updated.isoformat(),
@@ -362,7 +369,7 @@ def get_chat_session(
 
     return ChatSessionDetailResponse(
         chat_session_id=session_id,
-        description=chat_session.description,
+        description=_clean_chat_name(chat_session.description),
         persona_id=chat_session.persona_id,
         persona_name=chat_session.persona.name if chat_session.persona else None,
         personal_icon_name=chat_session.persona.icon_name,
@@ -956,7 +963,7 @@ async def search_chats(
 
         chat_summary = ChatSessionSummary(
             id=session.id,
-            name=session.description,
+            name=_clean_chat_name(session.description),
             persona_id=session.persona_id,
             time_created=session.time_created,
             shared_status=session.shared_status,
