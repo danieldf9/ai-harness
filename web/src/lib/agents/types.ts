@@ -33,6 +33,13 @@ export interface AgentLabel {
   name: string;
 }
 
+export interface HermesConfig {
+  memory_mode?: string;
+  allowed_tools_policy?: string;
+  fallback_behavior?: string;
+  system_prompt_override?: string;
+}
+
 export interface MinimalAgent {
   id: number;
   name: string;
@@ -53,6 +60,8 @@ export interface MinimalAgent {
   builtin_persona: boolean;
   labels?: AgentLabel[];
   owner: MinimalUserSnapshot | null;
+  engine_type?: "ONYX" | "HERMES";
+  hermes_config?: HermesConfig | null;
 }
 
 export interface Agent extends MinimalAgent {
@@ -96,6 +105,8 @@ export interface AgentUpsertParameters {
   user_file_ids: string[];
   hierarchy_node_ids?: number[];
   document_ids?: string[];
+  engine_type?: "ONYX" | "HERMES";
+  hermes_config?: HermesConfig | null;
 }
 
 export interface AgentUpsertRequest {
@@ -122,6 +133,8 @@ export interface AgentUpsertRequest {
   replace_base_system_prompt: boolean;
   hierarchy_node_ids: number[];
   document_ids: string[];
+  engine_type?: "ONYX" | "HERMES";
+  hermes_config?: HermesConfig | null;
 }
 
 export interface PaginatedAgentsResponse {

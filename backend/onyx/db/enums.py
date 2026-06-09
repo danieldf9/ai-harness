@@ -627,3 +627,8 @@ class AutoOptimizationRuleType(str, PyEnum):
     PROMPT_CANARY = "prompt_canary"
     RETRY_POLICY_TUNING = "retry_policy_tuning"
 
+
+class AgentEngineType(str, PyEnum):
+    ONYX = "onyx"
+    HERMES = "hermes"
+

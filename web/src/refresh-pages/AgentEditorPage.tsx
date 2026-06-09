@@ -14,6 +14,8 @@ import InputTypeInField from "@/refresh-components/form/InputTypeInField";
 import InputTextAreaField from "@/refresh-components/form/InputTextAreaField";
 import InputTypeInElementField from "@/refresh-components/form/InputTypeInElementField";
 import InputDatePickerField from "@/refresh-components/form/InputDatePickerField";
+import InputSelectField from "@/refresh-components/form/InputSelectField";
+import InputSelect from "@/refresh-components/inputs/InputSelect";
 import {
   Card as CardLayout,
   ContentAction,
@@ -91,7 +93,10 @@ import ConfirmationModalLayout from "@/refresh-components/layouts/ConfirmationMo
 import ShareAgentModal from "@/sections/modals/ShareAgentModal";
 import AgentKnowledgePane from "@/sections/knowledge/AgentKnowledgePane";
 import { ValidSources } from "@/lib/types";
-import { useVectorDbEnabled } from "@/providers/SettingsProvider";
+import {
+  useSettingsContext,
+  useVectorDbEnabled,
+} from "@/providers/SettingsProvider";
 import { useUser } from "@/providers/UserProvider";
 import { useTierAtLeast } from "@/hooks/useTierAtLeast";
 import { Tier } from "@/interfaces/settings";
@@ -493,6 +498,8 @@ export default function AgentEditorPage({
   const canUpdateFeaturedStatus = isAdmin || isCurator;
   const vectorDbEnabled = useVectorDbEnabled();
   const businessTier = useTierAtLeast(Tier.BUSINESS);
+  const settings = useSettingsContext();
+  const hermesEnabled = settings.settings.hermes_enabled ?? false;
 
   // Hooks for Knowledge section
   const { allRecentFiles, beginUpload } = useProjectsContext();
@@ -718,6 +725,13 @@ export default function AgentEditorPage({
     is_public: existingAgent?.is_public ?? false,
     label_ids: existingAgent?.labels?.map((l) => l.id) ?? [],
     is_featured: existingAgent?.is_featured ?? false,
+
+    // Hermes Engine configuration
+    engine_type: existingAgent?.engine_type ?? "ONYX",
+    hermes_memory_mode: existingAgent?.hermes_config?.memory_mode ?? "standard",
+    hermes_allowed_tools_policy: existingAgent?.hermes_config?.allowed_tools_policy ?? "all",
+    hermes_fallback_behavior: existingAgent?.hermes_config?.fallback_behavior ?? "default",
+    hermes_system_prompt_override: existingAgent?.hermes_config?.system_prompt_override ?? "",
   };
 
   const validationSchema = Yup.object().shape({
@@ -778,6 +792,13 @@ export default function AgentEditorPage({
         Yup.boolean(),
       ])
     ),
+
+    // Hermes
+    engine_type: Yup.string().oneOf(["ONYX", "HERMES"]),
+    hermes_memory_mode: Yup.string(),
+    hermes_allowed_tools_policy: Yup.string(),
+    hermes_fallback_behavior: Yup.string(),
+    hermes_system_prompt_override: Yup.string().optional(),
   });
 
   async function handleSubmit(values: typeof initialValues) {
@@ -882,6 +903,14 @@ export default function AgentEditorPage({
         replace_base_system_prompt: values.replace_base_system_prompt,
         task_prompt: values.reminders || "",
         datetime_aware: false,
+
+        engine_type: values.engine_type as "ONYX" | "HERMES",
+        hermes_config: values.engine_type === "HERMES" ? {
+          memory_mode: values.hermes_memory_mode,
+          allowed_tools_policy: values.hermes_allowed_tools_policy,
+          fallback_behavior: values.hermes_fallback_behavior,
+          system_prompt_override: values.hermes_system_prompt_override,
+        } : null,
       };
 
       // Call API
@@ -1560,6 +1589,93 @@ export default function AgentEditorPage({
                         paddingPerpendicular="fit"
                       />
 
+                      {hermesEnabled && (
+                        <>
+                          <GeneralLayouts.Section>
+                            <Card border="solid" rounding="lg">
+                              <GeneralLayouts.Section>
+                                <InputHorizontal
+                                  withLabel="engine_type"
+                                  title="Agent Engine"
+                                  description="Select the underlying reasoning engine for this agent."
+                                >
+                                  <InputSelectField name="engine_type">
+                                    <InputSelect.Trigger />
+                                    <InputSelect.Content>
+                                      <InputSelect.Item value="ONYX">Onyx Default</InputSelect.Item>
+                                      <InputSelect.Item value="HERMES">Hermes</InputSelect.Item>
+                                    </InputSelect.Content>
+                                  </InputSelectField>
+                                </InputHorizontal>
+
+                                {values.engine_type === "HERMES" && (
+                                  <div className="pl-4 border-l-2 border-border ml-2 space-y-4 my-2">
+                                    <InputHorizontal
+                                      withLabel="hermes_memory_mode"
+                                      title="Memory Mode"
+                                      description="How the agent remembers past interactions."
+                                    >
+                                      <InputSelectField name="hermes_memory_mode">
+                                        <InputSelect.Trigger />
+                                        <InputSelect.Content>
+                                          <InputSelect.Item value="standard">Standard</InputSelect.Item>
+                                          <InputSelect.Item value="long_term">Long Term</InputSelect.Item>
+                                        </InputSelect.Content>
+                                      </InputSelectField>
+                                    </InputHorizontal>
+                                    
+                                    <InputHorizontal
+                                      withLabel="hermes_allowed_tools_policy"
+                                      title="Allowed Tools Policy"
+                                      description="Which tools Hermes is allowed to use."
+                                    >
+                                      <InputSelectField name="hermes_allowed_tools_policy">
+                                        <InputSelect.Trigger />
+                                        <InputSelect.Content>
+                                          <InputSelect.Item value="all">All Attached Tools</InputSelect.Item>
+                                          <InputSelect.Item value="read_only">Read-Only Tools</InputSelect.Item>
+                                        </InputSelect.Content>
+                                      </InputSelectField>
+                                    </InputHorizontal>
+                                    
+                                    <InputHorizontal
+                                      withLabel="hermes_fallback_behavior"
+                                      title="Fallback Behavior"
+                                      description="What to do if Hermes fails to execute a tool."
+                                    >
+                                      <InputSelectField name="hermes_fallback_behavior">
+                                        <InputSelect.Trigger />
+                                        <InputSelect.Content>
+                                          <InputSelect.Item value="default">Default (Retry)</InputSelect.Item>
+                                          <InputSelect.Item value="abort">Abort</InputSelect.Item>
+                                        </InputSelect.Content>
+                                      </InputSelectField>
+                                    </InputHorizontal>
+                                    
+                                    <InputVertical
+                                      withLabel="hermes_system_prompt_override"
+                                      title="System Prompt Override"
+                                      suffix="optional"
+                                      description="Override Hermes's internal reasoning prompt."
+                                    >
+                                      <InputTextAreaField
+                                        name="hermes_system_prompt_override"
+                                        placeholder="Optional override for Hermes reasoning..."
+                                      />
+                                    </InputVertical>
+                                  </div>
+                                )}
+                              </GeneralLayouts.Section>
+                            </Card>
+                          </GeneralLayouts.Section>
+
+                          <Divider
+                            paddingParallel="fit"
+                            paddingPerpendicular="fit"
+                          />
+                        </>
+                      )}
+
                       <SimpleCollapsible>
                         <SimpleCollapsible.Header
                           title="Advanced Options"
@@ -1598,6 +1714,8 @@ export default function AgentEditorPage({
                                 )}
                               </GeneralLayouts.Section>
                             </Card>
+
+
 
                             <Card border="solid" rounding="lg">
                               <GeneralLayouts.Section>

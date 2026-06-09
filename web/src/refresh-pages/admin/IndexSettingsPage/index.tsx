@@ -703,6 +703,7 @@ interface IndexSettingsFormValues {
   custom_model_provider: EmbeddingProviderName | null;
   enable_contextual_rag: boolean;
   contextual_rag_model_configuration_id: number | null;
+  multipass_indexing: boolean;
 }
 
 export default function IndexSettingsPage() {
@@ -872,6 +873,7 @@ export default function IndexSettingsPage() {
       enable_contextual_rag: searchSettings?.enable_contextual_rag ?? false,
       contextual_rag_model_configuration_id:
         searchSettings?.contextual_rag_model_configuration_id ?? null,
+      multipass_indexing: searchSettings?.multipass_indexing ?? false,
     }),
     [currentEmbeddingModel, searchSettings]
   );
@@ -982,6 +984,7 @@ export default function IndexSettingsPage() {
                 contextualRagModelConfigurationId: values.enable_contextual_rag
                   ? values.contextual_rag_model_configuration_id
                   : null,
+                multipassIndexing: values.multipass_indexing,
               });
 
               if (!response.ok) {
@@ -1512,25 +1515,20 @@ export default function IndexSettingsPage() {
                     />
 
                     <CloudDisabled
-                      disabled
-                      tooltip="Multipass Indexing is disabled temporarily and will be available in the future."
+                      disabled={isReindexing}
+                      tooltip={
+                        isReindexing
+                          ? "Cancel the in-progress re-index to change retrieval settings."
+                          : undefined
+                      }
                     >
                       <Card border="solid" rounding="lg">
                         <InputHorizontal
                           title="Multipass Indexing"
                           description="Index documents as chunks of varying sizes to better identify relevant sources."
-                          tag={{
-                            title: "temporarily unavailable",
-                            color: "gray",
-                          }}
                           withLabel
                         >
-                          <Switch
-                            checked={
-                              searchSettings?.multipass_indexing ?? false
-                            }
-                            disabled
-                          />
+                          <SwitchField name="multipass_indexing" />
                         </InputHorizontal>
                       </Card>
                     </CloudDisabled>

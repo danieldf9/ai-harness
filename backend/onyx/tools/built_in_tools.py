@@ -1,6 +1,7 @@
 from typing import Type
 from typing import Union
 
+from onyx.tools.tool_implementations.browser.browser_tool import BrowserTool
 from onyx.tools.tool_implementations.coding_agent.coding_agent_tool import (
     CodingAgentTool,
 )
@@ -31,6 +32,7 @@ BUILT_IN_TOOL_TYPES = Union[
     FileReaderTool,
     MemoryTool,
     CodingAgentTool,
+    BrowserTool,
 ]
 
 BUILT_IN_TOOL_MAP: dict[str, Type[BUILT_IN_TOOL_TYPES]] = {
@@ -43,6 +45,7 @@ BUILT_IN_TOOL_MAP: dict[str, Type[BUILT_IN_TOOL_TYPES]] = {
     FileReaderTool.__name__: FileReaderTool,
     MemoryTool.__name__: MemoryTool,
     CodingAgentTool.__name__: CodingAgentTool,
+    BrowserTool.__name__: BrowserTool,
 }
 
 STOPPING_TOOLS_NAMES: list[str] = [ImageGenerationTool.NAME]

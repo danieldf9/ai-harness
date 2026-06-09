@@ -626,6 +626,19 @@ export default function ChatPreferencesPage() {
                 />
               </InputHorizontal>
               <InputHorizontal
+                title="Hermes Engine"
+                tag={{ title: "beta", color: "green" }}
+                description="Enable Hermes as a native agent engine option. Hermes provides advanced reasoning and structured fallback behaviors."
+                withLabel
+              >
+                <Switch
+                  checked={s.hermes_enabled ?? false}
+                  onCheckedChange={(checked) => {
+                    void saveSettings({ hermes_enabled: checked });
+                  }}
+                />
+              </InputHorizontal>
+              <InputHorizontal
                 title="Chat Auto-Scroll"
                 description="Automatically scroll to new content as chat generates response. Users can override this in their personal settings."
                 withLabel

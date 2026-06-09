@@ -1265,6 +1265,8 @@ API_KEY_HASH_ROUNDS = (
 #####
 # MCP Server Configs
 #####
+ENABLE_HERMES_ENGINE = os.environ.get("ENABLE_HERMES_ENGINE", "").lower() == "true"
+
 MCP_SERVER_ENABLED = os.environ.get("MCP_SERVER_ENABLED", "").lower() == "true"
 MCP_SERVER_HOST = os.environ.get("MCP_SERVER_HOST", "0.0.0.0")  # noqa: S104 — server bind address; intentional default for containerized deployment
 MCP_SERVER_PORT = int(os.environ.get("MCP_SERVER_PORT") or 8090)

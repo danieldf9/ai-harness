@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from pydantic import Field
 
 from onyx.configs.constants import DocumentSource
+from onyx.db.enums import AgentEngineType
 from onyx.db.enums import HierarchyNodeType
 from onyx.db.models import Document
 from onyx.db.models import HierarchyNode
@@ -136,6 +137,9 @@ class PersonaUpsertRequest(BaseModel):
     task_prompt: str
     datetime_aware: bool
 
+    engine_type: AgentEngineType | None = None
+    hermes_config: dict | None = None
+
 
 class MinimalPersonaSnapshot(BaseModel):
     """Minimal persona model optimized for ChatPage.tsx - only includes fields actually used"""
@@ -266,6 +270,9 @@ class PersonaSnapshot(BaseModel):
     task_prompt: str | None = None
     datetime_aware: bool = True
 
+    engine_type: AgentEngineType | None = None
+    hermes_config: dict | None = None
+
     @classmethod
     def from_model(cls, persona: Persona) -> "PersonaSnapshot":
         return PersonaSnapshot(
@@ -314,6 +321,8 @@ class PersonaSnapshot(BaseModel):
             replace_base_system_prompt=persona.replace_base_system_prompt,
             task_prompt=persona.task_prompt,
             datetime_aware=persona.datetime_aware,
+            engine_type=persona.engine_type,
+            hermes_config=persona.hermes_config,
         )
 
 

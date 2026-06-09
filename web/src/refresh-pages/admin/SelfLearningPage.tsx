@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { SettingsLayouts } from "@opal/layouts";
+import { SettingsLayouts, IllustrationContent } from "@opal/layouts";
+import SvgNoResult from "@opal/illustrations/no-result";
 import { SvgActivity, SvgCheck, SvgX, SvgSimpleLoader } from "@opal/icons";
 import { Button, Table, createTableColumns, Tag } from "@opal/components";
 import Text from "@/refresh-components/texts/Text";
@@ -209,6 +210,13 @@ export default function SelfLearningPage() {
               columns={recommendationColumns(handleApprove, handleReject, handleRollback)}
               getRowId={(row) => String(row.id)}
               pageSize={10}
+              emptyState={
+                <IllustrationContent
+                  illustration={SvgNoResult}
+                  title="No learning recommendations"
+                  description="Learning recommendations will appear here when the system captures feedback or evaluates performance."
+                />
+              }
             />
           </div>
 

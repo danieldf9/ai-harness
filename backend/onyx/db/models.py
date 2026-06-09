@@ -58,6 +58,7 @@ from onyx.configs.constants import SearchFeedbackType
 from onyx.configs.constants import TokenRateLimitScope
 from onyx.connectors.models import InputType
 from onyx.db.enums import AccessType
+from onyx.db.enums import AgentEngineType
 from onyx.db.enums import AccountType
 from onyx.db.enums import ApprovalDecidedVia
 from onyx.db.enums import ApprovalDecision
@@ -3635,6 +3636,8 @@ class Persona(Base):
     )
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
+    engine_type: Mapped[AgentEngineType] = mapped_column(Enum(AgentEngineType, native_enum=False), default=AgentEngineType.ONYX, server_default=AgentEngineType.ONYX.value, nullable=False)
+    hermes_config: Mapped[dict[str, Any] | None] = mapped_column(PGJSONB, nullable=True)
 
     # Canonical FK encoding both provider and model for the persona's LLM override.
     # NOTE: only applied on actual response generation — not used for auto-detected

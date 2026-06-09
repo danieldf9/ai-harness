@@ -43,6 +43,7 @@ from onyx.server.features.persona.models import MinimalPersonaSnapshot
 from onyx.server.features.persona.models import PersonaSharedNotificationData
 from onyx.server.features.persona.models import PersonaSnapshot
 from onyx.server.features.persona.models import PersonaUpsertRequest
+from onyx.db.enums import AgentEngineType
 from onyx.server.features.tool.tool_visibility import should_expose_tool_to_fe
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_versioned_implementation
@@ -320,6 +321,8 @@ def create_update_persona(
             commit=False,
             hierarchy_node_ids=create_persona_request.hierarchy_node_ids,
             document_ids=create_persona_request.document_ids,
+            engine_type=create_persona_request.engine_type,
+            hermes_config=create_persona_request.hermes_config,
         )
 
         versioned_update_persona_access = fetch_versioned_implementation(
@@ -934,6 +937,8 @@ def upsert_persona(
     hierarchy_node_ids: list[int] | None = None,
     document_ids: list[str] | None = None,
     replace_base_system_prompt: bool = False,
+    engine_type: AgentEngineType | None = None,
+    hermes_config: dict | None = None,
 ) -> Persona:
     """
     NOTE: This operation cannot update persona configuration options that
@@ -1066,6 +1071,10 @@ def upsert_persona(
         if datetime_aware is not None:
             existing_persona.datetime_aware = datetime_aware
         existing_persona.replace_base_system_prompt = replace_base_system_prompt
+        if engine_type is not None:
+            existing_persona.engine_type = engine_type
+        if hermes_config is not None:
+            existing_persona.hermes_config = hermes_config
 
         # Do not delete any associations manually added unless
         # a new updated list is provided
@@ -1128,6 +1137,8 @@ def upsert_persona(
             labels=labels or [],
             hierarchy_nodes=hierarchy_nodes or [],
             attached_documents=attached_documents or [],
+            engine_type=engine_type if engine_type is not None else AgentEngineType.ONYX,
+            hermes_config=hermes_config,
         )
         db_session.add(new_persona)
         if user_files:

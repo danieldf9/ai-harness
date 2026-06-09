@@ -368,13 +368,22 @@ export const AgentTimeline = React.memo(function AgentTimeline({
       headerContent={
         <div
           className={cn(
-            "flex flex-1 min-w-0 h-full items-center justify-between p-1 rounded-t-12 transition-colors duration-300",
+            "flex flex-1 min-w-0 h-full items-center p-1 rounded-t-12 transition-colors duration-300",
             headerIsInteractive && "hover:bg-background-tint-00",
             showTintedBackground && "bg-background-tint-00",
             showRoundedBottom && "rounded-b-12"
           )}
         >
-          {renderHeader()}
+          <div className="flex-1 min-w-0 flex items-center">
+            {renderHeader()}
+          </div>
+          {chatState.agent?.engine_type?.toUpperCase() === "HERMES" && (
+            <div className="shrink-0 pl-2 pr-1">
+              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-full shadow-xs uppercase tracking-wider cursor-default" title="Powered by Hermes Engine">
+                Hermes
+              </span>
+            </div>
+          )}
         </div>
       }
     >

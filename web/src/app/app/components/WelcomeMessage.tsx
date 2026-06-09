@@ -63,9 +63,16 @@ export default function WelcomeMessage({
         width="fit"
       >
         <AgentAvatar agent={agent} size={36} />
-        <Text as="p" headingH2>
-          {agent.name}
-        </Text>
+        <div className="flex items-center gap-2">
+          <Text as="p" headingH2>
+            {agent.name}
+          </Text>
+          {agent.engine_type?.toUpperCase() === "HERMES" && (
+            <span className="px-2 py-0.5 text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-full flex items-center shadow-xs">
+              Hermes Engine
+            </span>
+          )}
+        </div>
       </Section>
     );
   }

@@ -40,6 +40,7 @@ export interface Settings {
   deep_research_enabled?: boolean;
   multi_model_chat_enabled?: boolean;
   search_ui_enabled?: boolean;
+  hermes_enabled?: boolean;
 
   // Image processing settings
   image_extraction_and_analysis_enabled?: boolean;
