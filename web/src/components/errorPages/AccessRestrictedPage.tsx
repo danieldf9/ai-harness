@@ -7,7 +7,6 @@ import { Button } from "@opal/components";
 import InlineExternalLink from "@/refresh-components/InlineExternalLink";
 import { logout } from "@/lib/user";
 import { NEXT_PUBLIC_CLOUD_ENABLED } from "@/lib/constants";
-import { useLicense } from "@/hooks/useLicense";
 import { useSettingsContext } from "@/providers/SettingsProvider";
 import { ApplicationStatus } from "@/interfaces/settings";
 import Text from "@/refresh-components/texts/Text";
@@ -38,14 +37,10 @@ const fetchResubscriptionSession =
 export default function AccessRestricted() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { data: license } = useLicense();
   const settings = useSettingsContext();
-
   const isSeatLimitExceeded =
     settings.settings.application_status ===
     ApplicationStatus.SEAT_LIMIT_EXCEEDED;
-  const hadPreviousLicense = license?.has_license === true;
-  const showRenewalMessage = NEXT_PUBLIC_CLOUD_ENABLED || hadPreviousLicense;
 
   function getSeatLimitMessage() {
     const { used_seats, seat_count } = settings.settings;
@@ -58,10 +53,8 @@ export default function AccessRestricted() {
 
   const initialModalMessage = isSeatLimitExceeded
     ? getSeatLimitMessage()
-    : showRenewalMessage
-      ? NEXT_PUBLIC_CLOUD_ENABLED
-        ? "Your access to Onyx has been temporarily suspended due to a lapse in your subscription."
-        : "Your access to Onyx has been temporarily suspended due to a lapse in your license."
+    : NEXT_PUBLIC_CLOUD_ENABLED
+      ? "Your access to Onyx has been temporarily suspended due to a lapse in your subscription."
       : "An Enterprise license is required to use Onyx. Your data is protected and will be available once a license is activated.";
 
   const handleResubscribe = async () => {
@@ -96,10 +89,6 @@ export default function AccessRestricted() {
             If you are an administrator, you can manage users on the{" "}
             <Link className={linkClassName} href="/admin/users">
               User Management
-            </Link>{" "}
-            page or upgrade your license on the{" "}
-            <Link className={linkClassName} href="/admin/billing">
-              Admin Billing
             </Link>{" "}
             page.
           </Text>
@@ -148,22 +137,15 @@ export default function AccessRestricted() {
       ) : (
         <>
           <Text text03>
-            {hadPreviousLicense
-              ? "To reinstate your access and continue using Onyx, please contact your system administrator to renew your license."
-              : "To get started, please contact your system administrator to obtain an Enterprise license."}
+            To get started, please contact your system administrator to obtain an Enterprise license.
           </Text>
 
           <Text text03>
-            If you are the administrator, please visit the{" "}
-            <Link className={linkClassName} href="/admin/billing">
-              Admin Billing
-            </Link>{" "}
-            page to {hadPreviousLicense ? "renew" : "activate"} your license,
-            sign up through Stripe or reach out to{" "}
+            If you are the administrator, please reach out to{" "}
             <a className={linkClassName} href="mailto:support@onyx.app">
               support@onyx.app
             </a>{" "}
-            for billing assistance.
+            for licensing assistance.
           </Text>
 
           <div className="flex flex-row gap-2">

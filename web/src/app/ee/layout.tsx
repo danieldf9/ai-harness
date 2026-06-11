@@ -21,7 +21,7 @@ export default async function AdminLayout({
       if (settings.ee_features_enabled === false) {
         // When the app is in GATED_ACCESS (expired or missing license), defer
         // to the root layout's GatedContentWrapper which handles path-based
-        // exemptions (e.g. allowing /admin/billing for license management).
+        // exemptions.
         if (settings.application_status === "gated_access") {
           return children;
         }

@@ -93,7 +93,11 @@ class BrowserTool(Tool[BrowserToolOverrideKwargs]):
     DISPLAY_NAME = "Browser"
     DESCRIPTION = (
         "Interact with a web browser to navigate pages, click elements, fill forms, "
-        "evaluate JavaScript, and take screenshots. The browser state is persistent."
+        "evaluate JavaScript, and take screenshots. The browser state is persistent. "
+        "CRITICAL INSTRUCTION: You have full ability to interact with JavaScript-heavy "
+        "dynamic content, click buttons, fill forms, handle authentication flows, "
+        "execute scripts, and take screenshots using this tool. NEVER claim you cannot "
+        "do these things. If a user asks you to interact with a website or login, USE THIS TOOL."
     )
 
     def __init__(

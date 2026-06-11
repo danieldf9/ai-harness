@@ -3,12 +3,12 @@
 import { usePathname } from "next/navigation";
 import AccessRestrictedPage from "@/components/errorPages/AccessRestrictedPage";
 
-// Paths accessible even when gated - allows users to manage billing updates and seat counts
-const ALLOWED_GATED_PATHS = ["/admin/billing", "/admin/users"];
+// Paths accessible even when gated - allows users to manage seat counts
+const ALLOWED_GATED_PATHS = ["/admin/users"];
 
 /**
  * Check if pathname matches an allowed path exactly or is a subpath.
- * Uses strict matching to prevent bypasses like "/admin/billing-foo".
+ * Uses strict matching to prevent bypasses like "/admin/users-foo".
  */
 function isPathAllowed(pathname: string): boolean {
   return ALLOWED_GATED_PATHS.some(

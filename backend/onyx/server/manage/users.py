@@ -555,44 +555,7 @@ def bulk_invite_users(
             logger.error("Error sending email invite to invited users: %s", e)
             email_invite_status = EmailInviteStatus.SEND_FAILED
 
-    if MULTI_TENANT and not DEV_MODE:
-        # for billing purposes, write to the control plane about the number of new users
-        try:
-            logger.info("Registering tenant users")
-            fetch_ee_implementation_or_noop(
-                "onyx.server.tenants.billing", "register_tenant_users", None
-            )(tenant_id, get_live_users_count(db_session))
-        except Exception as e:
-            logger.error("Failed to register tenant users: %s", str(e))
-            logger.info(
-                "Reverting changes: removing users from tenant and resetting invited users"
-            )
-            try:
-                write_invited_users(initial_invited_users)  # Reset to original state
-                fetch_ee_implementation_or_noop(
-                    "onyx.server.tenants.user_mapping", "remove_users_from_tenant", None
-                )(new_invited_emails, tenant_id)
-            finally:
-                # Release the counter reservation regardless of whether the KV /
-                # user-mapping reverts above succeeded — otherwise a double-fault
-                # (billing failure + revert failure) permanently inflates the
-                # counter for an invite batch the system considers rolled back.
-                if trial_invite_reservation > 0:
-                    try:
-                        with get_session_with_shared_schema() as comp_session:
-                            release_trial_invites(
-                                comp_session, tenant_id, trial_invite_reservation
-                            )
-                            comp_session.commit()
-                    except Exception as comp_err:
-                        logger.error(
-                            "tenant_invite_counter release failed for tenant=%s, "
-                            "slots burned=%d: %s",
-                            tenant_id,
-                            trial_invite_reservation,
-                            comp_err,
-                        )
-            raise e
+
 
     return BulkInviteResponse(
         invited_count=number_of_invited_users,
@@ -620,17 +583,7 @@ def remove_invited_user(
         )([user_email.user_email], tenant_id)
     number_of_invited_users = remove_user_from_invited_users(user_email.user_email)
 
-    try:
-        if MULTI_TENANT and not DEV_MODE:
-            fetch_ee_implementation_or_noop(
-                "onyx.server.tenants.billing", "register_tenant_users", None
-            )(tenant_id, get_live_users_count(db_session))
-    except Exception:
-        logger.error(
-            "Request to update number of seats taken in control plane failed. "
-            "This may cause synchronization issues/out of date enforcement of seat limits."
-        )
-        raise
+
 
     return number_of_invited_users
 

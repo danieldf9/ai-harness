@@ -30,6 +30,7 @@ from onyx.tools.built_in_tools import get_built_in_tool_by_id
 from onyx.tools.interface import Tool
 from onyx.tools.models import DynamicSchemaInfo
 from onyx.tools.models import SearchToolUsage
+from onyx.tools.tool_implementations.browser.browser_tool import BrowserTool
 from onyx.tools.tool_implementations.coding_agent.coding_agent_tool import (
     CodingAgentTool,
 )
@@ -317,6 +318,15 @@ def _construct_tools_impl(
                         emitter=emitter,
                         user_file_ids=cfg.user_file_ids,
                         chat_file_ids=cfg.chat_file_ids,
+                    )
+                ]
+
+            # Handle Browser Tool
+            elif tool_cls.__name__ == BrowserTool.__name__:
+                tool_dict[db_tool_model.id] = [
+                    BrowserTool(
+                        tool_id=db_tool_model.id,
+                        emitter=emitter,
                     )
                 ]
 

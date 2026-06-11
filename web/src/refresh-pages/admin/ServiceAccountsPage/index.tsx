@@ -6,7 +6,7 @@ import { errorHandlingFetcher } from "@/lib/fetcher";
 import { SWR_KEYS } from "@/lib/swr-keys";
 import { SettingsLayouts } from "@opal/layouts";
 import { toast } from "@/hooks/useToast";
-import { Button, MessageCard, Text } from "@opal/components";
+import { Button, Text } from "@opal/components";
 import { Content, IllustrationContent } from "@opal/layouts";
 import SvgNoResult from "@opal/illustrations/no-result";
 import {
@@ -33,8 +33,6 @@ import LineItem from "@/refresh-components/buttons/LineItem";
 import ConfirmationModalLayout from "@/refresh-components/layouts/ConfirmationModalLayout";
 import { markdown } from "@opal/utils";
 
-import { useBillingInformation } from "@/hooks/useBillingInformation";
-import { BillingStatus, hasActiveSubscription } from "@/lib/billing/interfaces";
 import {
   deleteApiKey,
   regenerateApiKey,
@@ -62,12 +60,6 @@ export default function ServiceAccountsPage() {
     isLoading,
     error,
   } = useSWR<APIKey[]>(API_KEY_SWR_KEY, errorHandlingFetcher);
-
-  const { data: billingData } = useBillingInformation();
-  const isTrialing =
-    billingData !== undefined &&
-    hasActiveSubscription(billingData) &&
-    billingData.status === BillingStatus.TRIALING;
 
   const [fullApiKey, setFullApiKey] = useState<string | null>(null);
   const [showCreateUpdateForm, setShowCreateUpdateForm] = useState(false);
@@ -292,14 +284,6 @@ export default function ServiceAccountsPage() {
       />
 
       <SettingsLayouts.Body>
-        {isTrialing && (
-          <MessageCard
-            variant="warning"
-            title="Upgrade to a paid plan to create API keys."
-            description="Trial accounts do not include API key access — purchase a paid subscription to unlock this feature."
-          />
-        )}
-
         <div className="flex flex-col">
           <AdminListHeader
             hasItems={hasKeys}

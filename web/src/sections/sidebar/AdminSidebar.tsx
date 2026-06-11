@@ -13,11 +13,7 @@ import { CombinedSettings, Tier } from "@/interfaces/settings";
 import { tierAtLeast } from "@/lib/tiers";
 import { Divider, InputTypeIn, Spacer, SidebarTab } from "@opal/components";
 import { SvgArrowUpCircle, SvgSearch, SvgX } from "@opal/icons";
-import {
-  useBillingInformation,
-  useLicense,
-  hasActiveSubscription,
-} from "@/lib/billing";
+
 import { ADMIN_ROUTES, sidebarItem } from "@/lib/admin-routes";
 import { NEXT_PUBLIC_CLOUD_ENABLED } from "@/lib/constants";
 import useFilter from "@/hooks/useFilter";
@@ -52,7 +48,6 @@ function buildItems(
   tier: Tier | undefined,
   settings: CombinedSettings | null,
   customAnalyticsEnabled: boolean,
-  hasSubscription: boolean,
   hooksEnabled: boolean
 ): SidebarItemEntry[] {
   const items: SidebarItemEntry[] = [];
@@ -133,9 +128,6 @@ function buildItems(
 
   // 6. Organization (admin only)
   if (!isCurator) {
-    if (hasSubscription) {
-      add(SECTIONS.ORGANIZATION, ADMIN_ROUTES.BILLING);
-    }
     addGated(
       SECTIONS.ORGANIZATION,
       ADMIN_ROUTES.TOKEN_RATE_LIMITS,
@@ -153,16 +145,6 @@ function buildItems(
     ) {
       addGated(SECTIONS.USAGE, ADMIN_ROUTES.QUERY_HISTORY, Tier.BUSINESS);
     }
-  }
-
-  // 8. Upgrade Plan (admin only, no subscription)
-  if (!isCurator && !hasSubscription) {
-    items.push({
-      section: SECTIONS.UNLABELED,
-      name: "Upgrade Plan",
-      icon: SvgArrowUpCircle,
-      link: ADMIN_ROUTES.BILLING.path,
-    });
   }
 
   return items;
@@ -199,19 +181,8 @@ function AdminSidebarInner() {
   const { user } = useUser();
   const settings = useSettingsContext();
   const tier = settings?.settings.tier;
-  const { data: billingData, isLoading: billingLoading } =
-    useBillingInformation();
-  const { data: licenseData, isLoading: licenseLoading } = useLicense();
   const isCurator =
     user?.role === UserRole.CURATOR || user?.role === UserRole.GLOBAL_CURATOR;
-  // Default to true while loading to avoid flashing "Upgrade Plan"
-  const hasSubscriptionOrLicense =
-    billingLoading || licenseLoading
-      ? true
-      : Boolean(
-          (billingData && hasActiveSubscription(billingData)) ||
-          licenseData?.has_license
-        );
   // Hooks are ENTERPRISE-only and only available for self-hosted single-tenant.
   const hooksEnabled =
     tierAtLeast(tier, Tier.ENTERPRISE) &&
@@ -223,7 +194,6 @@ function AdminSidebarInner() {
     tier,
     settings,
     customAnalyticsEnabled,
-    hasSubscriptionOrLicense,
     hooksEnabled
   );
 
@@ -302,8 +272,8 @@ function AdminSidebarInner() {
                 icon={icon}
                 tooltip={markdown(
                   requiredTier === Tier.ENTERPRISE
-                    ? "This feature is available on the [Enterprise version of Onyx](/admin/billing) only."
-                    : "This feature is available on the [Business or Enterprise version of Onyx](/admin/billing) only."
+                    ? "This feature is available on the Enterprise version of Onyx only."
+                    : "This feature is available on the Business or Enterprise version of Onyx only."
                 )}
               >
                 {name}

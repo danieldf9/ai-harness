@@ -6,7 +6,6 @@ from httpx_oauth.clients.google import GoogleOAuth2
 
 from ee.onyx.server.analytics.api import router as analytics_router
 from ee.onyx.server.auth_check import check_ee_router_auth
-from ee.onyx.server.billing.api import router as billing_router
 from ee.onyx.server.documents.cc_pair import router as ee_document_cc_pair_router
 from ee.onyx.server.enterprise_settings.api import (
     admin_router as enterprise_settings_admin_router,
@@ -162,10 +161,6 @@ def get_application() -> FastAPI:
     include_router_with_global_prefix_prepended(application, usage_export_router)
     # License management
     include_router_with_global_prefix_prepended(application, license_router)
-
-    # Unified billing API - always registered in EE.
-    # Each endpoint is protected by admin permission checks.
-    include_router_with_global_prefix_prepended(application, billing_router)
 
     if MULTI_TENANT:
         # Tenant management

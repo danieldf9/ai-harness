@@ -67,7 +67,6 @@ import { useTierAtLeast } from "@/hooks/useTierAtLeast";
 import { Tier } from "@/interfaces/settings";
 import { useSettingsContext } from "@/providers/SettingsProvider";
 import { Tooltip } from "@opal/components";
-import { useCloudSubscription } from "@/hooks/useCloudSubscription";
 import { useSmoothStreaming } from "@/hooks/useSmoothStreaming";
 
 interface PAT {
@@ -1305,7 +1304,7 @@ function AccountsAccessSettings() {
     useState<CreatedTokenState | null>(null);
   const [tokenToDelete, setTokenToDelete] = useState<PAT | null>(null);
 
-  const canCreateTokens = useCloudSubscription();
+  const canCreateTokens = true;
 
   const showPasswordSection = Boolean(user?.password_configured);
   const showTokensSection = authType !== null;
@@ -1762,18 +1761,6 @@ function AccountsAccessSettings() {
                   </Section>
                 </Section>
               </Card>
-            ) : (
-              <Card>
-                <Section flexDirection="row" justifyContent="between">
-                  <Text font="secondary-body" color="text-03">
-                    Access tokens require an active paid subscription.
-                  </Text>
-                  <Button prominence="secondary" href="/admin/billing">
-                    Upgrade Plan
-                  </Button>
-                </Section>
-              </Card>
-            )}
           </Section>
         )}
       </Section>

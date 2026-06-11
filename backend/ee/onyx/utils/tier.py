@@ -27,9 +27,6 @@ from ee.onyx.configs.app_configs import LICENSE_ENFORCEMENT_ENABLED
 from ee.onyx.db.license import get_cached_license_metadata
 from ee.onyx.db.license import refresh_license_cache
 from ee.onyx.server.license.models import CustomerTier
-from ee.onyx.server.tenants.billing import fetch_billing_information
-from ee.onyx.server.tenants.models import BillingInformation
-from ee.onyx.server.tenants.models import SubscriptionStatusResponse
 from ee.onyx.server.tenants.tier_management import get_cached_tier
 from ee.onyx.server.tenants.tier_management import update_tenant_tier
 from onyx.db.engine.sql_engine import get_session_with_current_tenant
@@ -121,38 +118,10 @@ def _self_hosted_tier() -> Tier:
     return tier_from_license_metadata(metadata)
 
 
-def _extract_billing_state(
-    billing: BillingInformation | SubscriptionStatusResponse,
-) -> tuple[CustomerTier, datetime | None] | None:
-    customer_tier = getattr(billing, "customer_tier", None)
-    if customer_tier is None:
-        return None
-    trial_end = getattr(billing, "trial_end", None)
-    if not isinstance(trial_end, datetime):
-        trial_end = None
-    elif trial_end.tzinfo is None or trial_end.tzinfo.utcoffset(trial_end) is None:
-        # Mirrors the cache-read guard: a naive trial_end would crash the
-        # tz-aware comparison in `_effective_tier`. Drop it and log so a
-        # CP-side regression is visible.
-        logger.warning("CP returned naive trial_end; dropping: %r", trial_end)
-        trial_end = None
-    return customer_tier, trial_end
-
-
 def _lazy_refresh_from_cp(
     tenant_id: str,
 ) -> tuple[CustomerTier, datetime | None] | None:
-    try:
-        billing = fetch_billing_information(tenant_id)
-    except (requests.RequestException, ValueError) as e:
-        logger.warning(
-            "Tier lazy-refresh failed for tenant %s; CP unreachable: %s",
-            tenant_id,
-            e,
-        )
-        return None
-
-    return _extract_billing_state(billing)
+    return None
 
 
 def get_tier(tenant_id: str | None = None) -> Tier:

@@ -221,12 +221,6 @@ export const ADMIN_ROUTES = {
     title: "Appearance & Theming",
     sidebarLabel: "Appearance & Theming",
   },
-  BILLING: {
-    path: "/admin/billing",
-    icon: SvgWallet,
-    title: "Plans & Billing",
-    sidebarLabel: "Plans & Billing",
-  },
   HOOKS: {
     path: "/admin/hooks",
     icon: SvgShareWebhook,

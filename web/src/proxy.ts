@@ -36,8 +36,6 @@ export const config = {
     "/admin/standard-answer/:path*",
     "/agents/stats/:path*",
 
-    // Cloud only
-    "/admin/billing/:path*",
   ],
 };
 
